@@ -1,0 +1,88 @@
+{
+  "rules": [
+    {
+      "featureId": "LOCAL_VAR_TYPE",
+      "introducedInJdk": 10,
+      "description": "Local variable type inference using var keyword",
+      "transformerClass": "com.reversemigrate.transform.transformers.VarTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "SWITCH_EXPRESSION",
+      "introducedInJdk": 14,
+      "description": "Switch expressions with arrow syntax and yield",
+      "transformerClass": "com.reversemigrate.transform.transformers.SwitchExpressionTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "TEXT_BLOCK",
+      "introducedInJdk": 15,
+      "description": "Multi-line text blocks with triple-quote delimiters",
+      "transformerClass": "com.reversemigrate.transform.transformers.TextBlockTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "PATTERN_MATCHING_INSTANCEOF",
+      "introducedInJdk": 16,
+      "description": "Pattern matching for instanceof with binding variables",
+      "transformerClass": "com.reversemigrate.transform.transformers.PatternMatchingTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "RECORD",
+      "introducedInJdk": 16,
+      "description": "Record classes as data carriers",
+      "transformerClass": "com.reversemigrate.transform.transformers.RecordTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "SEALED_CLASS",
+      "introducedInJdk": 17,
+      "description": "Sealed classes and interfaces with permits clause",
+      "transformerClass": "com.reversemigrate.transform.transformers.SealedClassTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "SWITCH_PATTERN_MATCHING",
+      "introducedInJdk": 21,
+      "description": "Pattern matching for switch with type patterns and guarded patterns",
+      "transformerClass": "com.reversemigrate.transform.transformers.SwitchPatternMatchingTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "RECORD_PATTERN",
+      "introducedInJdk": 21,
+      "description": "Record deconstruction patterns in instanceof and switch",
+      "transformerClass": "com.reversemigrate.transform.transformers.RecordPatternTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "SEQUENCED_COLLECTION",
+      "introducedInJdk": 21,
+      "description": "Sequenced collection API methods (getFirst, getLast, addFirst, etc.)",
+      "transformerClass": "com.reversemigrate.transform.transformers.SequencedCollectionTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "UNNAMED_VARIABLE",
+      "introducedInJdk": 22,
+      "description": "Unnamed variables and patterns using underscore _",
+      "transformerClass": "com.reversemigrate.transform.transformers.UnnamedVariableTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "COMPACT_SOURCE_FILE",
+      "introducedInJdk": 25,
+      "description": "Compact source files with implicit class and instance main methods",
+      "transformerClass": "com.reversemigrate.transform.transformers.CompactSourceFileTransformer",
+      "enabled": true
+    },
+    {
+      "featureId": "FLEXIBLE_CONSTRUCTOR_BODY",
+      "introducedInJdk": 25,
+      "description": "Statements before super()/this() in constructor bodies",
+      "transformerClass": "com.reversemigrate.transform.transformers.FlexibleConstructorTransformer",
+      "enabled": true
+    }
+  ]
+}

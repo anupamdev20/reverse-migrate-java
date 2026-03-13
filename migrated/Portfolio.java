@@ -156,7 +156,9 @@ public class SwitchPatternsTest {
     }
 
     public static String handleNull(Object obj) {
-        if (obj instanceof String) {
+        if (obj == null) {
+            return "It's null!";
+        } else if (obj instanceof String) {
             String s = (String) obj;
             return "It's a string: " + s;
         } else {

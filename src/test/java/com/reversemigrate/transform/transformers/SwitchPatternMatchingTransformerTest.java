@@ -87,4 +87,26 @@ class SwitchPatternMatchingTransformerTest {
         assertTrue(transformed.contains("if (obj instanceof Integer && ((Integer) obj) > 0)"), "Guard condition should be integrated into if");
         assertTrue(transformed.contains("else if (obj instanceof Integer)"), "Should fall back to non-guarded");
     }
+
+    @Test
+    @DisplayName("Transforms switch with null cases")
+    void testSwitchWithNull() {
+        String source = "class Test {\n" +
+                "    String method(Object obj) {\n" +
+                "        return switch (obj) {\n" +
+                "            case null -> \"It's null!\";\n" +
+                "            case String s -> \"It's a string\";\n" +
+                "            default -> \"Something else\";\n" +
+                "        };\n" +
+                "    }\n" +
+                "}\n";
+
+        CompilationUnit cu = StaticJavaParser.parse(source);
+        cu = transformer.transform(cu);
+        String transformed = cu.toString();
+
+        assertFalse(transformed.contains("switch"), "Switch should be removed");
+        assertTrue(transformed.contains("if (obj == null) {"), "Should have a null check");
+        assertTrue(transformed.contains("return \"It's null!\";"), "Should execute block");
+    }
 }

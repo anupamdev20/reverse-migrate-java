@@ -66,7 +66,8 @@ public class SwitchPatternMatchingTransformer implements FeatureTransformer {
     }
 
     private boolean hasTypePatterns(Node switchNode) {
-        return !switchNode.findAll(TypePatternExpr.class).isEmpty();
+        return !switchNode.findAll(TypePatternExpr.class).isEmpty() ||
+               !switchNode.findAll(NullLiteralExpr.class).isEmpty();
     }
 
     private void transformPatternSwitch(SwitchExpr switchExpr) {
@@ -233,6 +234,29 @@ public class SwitchPatternMatchingTransformer implements FeatureTransformer {
                         currentIf.setElseStmt(newIf);
                     }
                     currentIf = newIf;
+                } else if (label instanceof NullLiteralExpr) {
+                    BinaryExpr nullCheck = new BinaryExpr(selector.clone(), new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
+                    
+                    BlockStmt thenBlock = new BlockStmt();
+                    
+                    // Add the body
+                    for (Statement stmt : entry.getStatements()) {
+                        if (stmt instanceof ExpressionStmt exprStmt) {
+                            addAssignmentOrReturn(thenBlock, exprStmt.getExpression(), targetName, target);
+                        } else if (stmt instanceof BlockStmt blk) {
+                            processBlockForAssignment(blk, targetName, target, thenBlock);
+                        } else {
+                            thenBlock.addStatement(stmt.clone());
+                        }
+                    }
+
+                    IfStmt newIf = new IfStmt(nullCheck, thenBlock, null);
+                    if (firstIf == null) {
+                        firstIf = newIf;
+                    } else if (currentIf != null) {
+                        currentIf.setElseStmt(newIf);
+                    }
+                    currentIf = newIf;
                 }
             }
         }
@@ -290,6 +314,23 @@ public class SwitchPatternMatchingTransformer implements FeatureTransformer {
                     }
 
                     IfStmt newIf = new IfStmt(condition, thenBlock, null);
+                    if (firstIf == null) {
+                        firstIf = newIf;
+                    } else if (currentIf != null) {
+                        currentIf.setElseStmt(newIf);
+                    }
+                    currentIf = newIf;
+                } else if (label instanceof NullLiteralExpr) {
+                    BinaryExpr nullCheck = new BinaryExpr(selector.clone(), new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
+                    
+                    BlockStmt thenBlock = new BlockStmt();
+                    for (Statement stmt : entry.getStatements()) {
+                        if (!(stmt instanceof BreakStmt)) {
+                            thenBlock.addStatement(stmt.clone());
+                        }
+                    }
+
+                    IfStmt newIf = new IfStmt(nullCheck, thenBlock, null);
                     if (firstIf == null) {
                         firstIf = newIf;
                     } else if (currentIf != null) {

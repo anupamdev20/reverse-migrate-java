@@ -1,0 +1,14 @@
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/config/TransformRuleConfigTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/engine/JavaSourceMigratorTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/CompactSourceFileTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/FlexibleConstructorTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/PatternMatchingTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/RecordPatternTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/RecordTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/SealedClassTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/SequencedCollectionTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/SwitchExpressionTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/SwitchPatternMatchingTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/TextBlockTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/UnnamedVariableTransformerTest.java
+/Users/anupamdev/reverseMigrate/src/test/java/com/reversemigrate/transform/transformers/VarTransformerTest.java

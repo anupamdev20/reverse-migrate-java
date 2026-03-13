@@ -1,0 +1,14 @@
+com/reversemigrate/config/TransformRuleConfigTest.class
+com/reversemigrate/transform/transformers/SwitchExpressionTransformerTest.class
+com/reversemigrate/transform/transformers/UnnamedVariableTransformerTest.class
+com/reversemigrate/transform/transformers/SwitchPatternMatchingTransformerTest.class
+com/reversemigrate/transform/transformers/VarTransformerTest.class
+com/reversemigrate/transform/transformers/RecordPatternTransformerTest.class
+com/reversemigrate/transform/transformers/SequencedCollectionTransformerTest.class
+com/reversemigrate/transform/transformers/CompactSourceFileTransformerTest.class
+com/reversemigrate/transform/transformers/PatternMatchingTransformerTest.class
+com/reversemigrate/transform/transformers/SealedClassTransformerTest.class
+com/reversemigrate/transform/transformers/TextBlockTransformerTest.class
+com/reversemigrate/transform/transformers/FlexibleConstructorTransformerTest.class
+com/reversemigrate/engine/JavaSourceMigratorTest.class
+com/reversemigrate/transform/transformers/RecordTransformerTest.class
