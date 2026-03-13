@@ -7,6 +7,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.StaticJavaParser;
 import com.reversemigrate.transform.FeatureTransformer;
 
 import java.util.ArrayList;
@@ -67,7 +68,8 @@ public class SwitchPatternMatchingTransformer implements FeatureTransformer {
 
     private boolean hasTypePatterns(Node switchNode) {
         return !switchNode.findAll(TypePatternExpr.class).isEmpty() ||
-               !switchNode.findAll(NullLiteralExpr.class).isEmpty();
+               !switchNode.findAll(NullLiteralExpr.class).isEmpty() ||
+               !switchNode.findAll(RecordPatternExpr.class).isEmpty();
     }
 
     private void transformPatternSwitch(SwitchExpr switchExpr) {
@@ -257,6 +259,9 @@ public class SwitchPatternMatchingTransformer implements FeatureTransformer {
                         currentIf.setElseStmt(newIf);
                     }
                     currentIf = newIf;
+                } else if (label instanceof RecordPatternExpr recordPattern) {
+                    currentIf = processRecordPattern(recordPattern, selector, targetName, target, entry, firstIf, currentIf, false);
+                    if (firstIf == null) firstIf = currentIf;
                 }
             }
         }
@@ -337,11 +342,69 @@ public class SwitchPatternMatchingTransformer implements FeatureTransformer {
                         currentIf.setElseStmt(newIf);
                     }
                     currentIf = newIf;
+                } else if (label instanceof RecordPatternExpr recordPattern) {
+                    currentIf = processRecordPattern(recordPattern, selector, null, null, entry, firstIf, currentIf, true);
+                    if (firstIf == null) firstIf = currentIf;
                 }
             }
         }
 
         return firstIf;
+    }
+
+    private IfStmt processRecordPattern(RecordPatternExpr recordPattern, Expression selector, 
+                                        String targetName, AssignmentTarget target, 
+                                        SwitchEntry entry, IfStmt firstIf, IfStmt currentIf, boolean isStmt) {
+        Type recordType = recordPattern.getType();
+
+        InstanceOfExpr instanceCheck = new InstanceOfExpr();
+        instanceCheck.setExpression(selector.clone());
+        instanceCheck.setType((ReferenceType) recordType.clone());
+
+        Expression condition = instanceCheck;
+        
+        BlockStmt thenBlock = new BlockStmt();
+        String tempVar = "_" + recordType.asString().toLowerCase().charAt(0);
+        CastExpr cast = new CastExpr(recordType.clone(), selector.clone());
+        VariableDeclarator tempDecl = new VariableDeclarator(recordType.clone(), tempVar, cast);
+        thenBlock.addStatement(new ExpressionStmt(new VariableDeclarationExpr(tempDecl)));
+
+        // Unpack components
+        List<PatternExpr> componentPatterns = recordPattern.getPatternList();
+        for (PatternExpr componentPattern : componentPatterns) {
+            if (componentPattern instanceof TypePatternExpr tp) {
+                String componentName = tp.getNameAsString();
+                Type componentType = tp.getType();
+                // If it's `var`, we can just keep it as `var` and let the var transformer handle it
+                // later, or we replace it with `Object` if the target JDK is < 10.
+                MethodCallExpr accessor = new MethodCallExpr(new NameExpr(tempVar), componentName);
+                VariableDeclarator compDecl = new VariableDeclarator(componentType.clone(), componentName, accessor);
+                thenBlock.addStatement(new ExpressionStmt(new VariableDeclarationExpr(compDecl)));
+            }
+        }
+
+        if (entry.getGuard().isPresent()) {
+            Expression guard = entry.getGuard().get().clone();
+            condition = new BinaryExpr(instanceCheck, guard, BinaryExpr.Operator.AND);
+        }
+
+        for (Statement stmt : entry.getStatements()) {
+            if (stmt instanceof ExpressionStmt exprStmt && !isStmt) {
+                addAssignmentOrReturn(thenBlock, exprStmt.getExpression(), targetName, target);
+            } else if (stmt instanceof BlockStmt blk && !isStmt) {
+                processBlockForAssignment(blk, targetName, target, thenBlock);
+            } else if (!(stmt instanceof BreakStmt) && isStmt) {
+                thenBlock.addStatement(stmt.clone());
+            } else if (!isStmt) {
+                thenBlock.addStatement(stmt.clone());
+            }
+        }
+
+        IfStmt newIf = new IfStmt(condition, thenBlock, null);
+        if (currentIf != null) {
+            currentIf.setElseStmt(newIf);
+        }
+        return newIf;
     }
 
     private void processBlockForAssignment(BlockStmt source, String targetName, AssignmentTarget target, BlockStmt targetBlock) {

@@ -109,4 +109,32 @@ class SwitchPatternMatchingTransformerTest {
         assertTrue(transformed.contains("if (obj == null) {"), "Should have a null check");
         assertTrue(transformed.contains("return \"It's null!\";"), "Should execute block");
     }
+
+    @Test
+    @DisplayName("Transforms switch with record patterns")
+    void testSwitchWithRecordPatterns() {
+        String source = "class Test {\n" +
+                "    String processCoordinate(Object obj) {\n" +
+                "        return switch (obj) {\n" +
+                "            case Point(int x, int y) when x == y -> \"Diagonal\";\n" +
+                "            case Point(int x, int y) -> \"Off diagonal\";\n" +
+                "            case Box(var content) -> \"Box\";\n" +
+                "            default -> \"Other\";\n" +
+                "        };\n" +
+                "    }\n" +
+                "}\n";
+
+        CompilationUnit cu = StaticJavaParser.parse(source);
+        cu = transformer.transform(cu);
+        String transformed = cu.toString();
+
+        assertFalse(transformed.contains("switch"), "Switch should be removed");
+        assertTrue(transformed.contains("if (obj instanceof Point && _p.x() == _p.y())") ||
+                   transformed.contains("if (obj instanceof Point && ((Point) obj).x() == ((Point) obj).y())") || 
+                   transformed.contains("if (obj instanceof Point && x == y)"),
+                "Should have guard logic extracted");
+        assertTrue(transformed.contains("int x = _p.x();"), "Should extract component x");
+        assertTrue(transformed.contains("int y = _p.y();"), "Should extract component y");
+        assertTrue(transformed.contains("var content = _b.content();"), "Should extract var components");
+    }
 }
